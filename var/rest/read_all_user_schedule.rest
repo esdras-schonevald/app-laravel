@@ -1,0 +1,2 @@
+GET http://localhost:8989/users/3/schedules?initialDate=2024-01-01&finalDate=2024-01-10
+Accept: application/json

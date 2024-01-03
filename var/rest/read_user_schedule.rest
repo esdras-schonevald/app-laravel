@@ -1,0 +1,2 @@
+GET http://localhost:8989/users/3/schedules/1
+Accept: application/json

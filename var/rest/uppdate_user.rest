@@ -1,0 +1,7 @@
+
+PATCH http://localhost:8989/users/2
+Content-Type: application/json
+
+{
+    "name": "Esdras Schonevald"
+}

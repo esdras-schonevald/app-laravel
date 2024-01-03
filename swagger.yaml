@@ -1,0 +1,343 @@
+openapi: 3.1.0
+
+info:
+  title: Desafio Técnico - Backend PHP 2023
+  description:
+    Módulo de Agenda
+    ![farmarcas](https://dfconsultec.com.br/wp-content/uploads/2020/06/logo__sejafarmarcas.png)
+  version: 0.0.0
+
+servers:
+  - url: http://127.0.0.1:8989
+
+paths:
+  /users:
+    post:
+      tags:
+        - Usuário
+      summary: Cria um novo registro de usuário
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '422':
+          description: Unprocessable Content
+
+    get:
+      tags:
+        - Usuário
+      summary:
+        Lista os usuários.
+        Filtra por página.
+      parameters:
+        - name: page
+          in: query
+          type: integer
+          required: false
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+  /users/{userId}:
+    get:
+      tags:
+        - Usuário
+      summary:
+        Carrega um usuário
+      parameters:
+        - name: userId
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+        '404':
+          description: Not Found
+
+    patch:
+      tags:
+        - Usuário
+      summary:
+        Atualiza os dados de um usuário
+      parameters:
+        - name: userId
+          in: path
+          type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+
+    delete:
+      tags:
+        - Usuário
+      summary:
+        Apaga os dados de um usuário
+      parameters:
+        - name: userId
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+        '404':
+          description: Not Found
+
+  /users/{userId}/schedules:
+    post:
+      tags:
+        - Agenda de Usuário
+      summary: Cria uma atividade na agenda do usuário
+      parameters:
+        - name: userId
+          in: path
+          type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Activity'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSchedule'
+        '404':
+          description: Not Found
+        '422':
+          description: Unprocessable Content
+        '429':
+          description: Too Many Requests
+    get:
+      tags:
+        - Agenda de Usuário
+      summary:
+        - Lista todas as atividades da agenda do usuário.
+        - Filtra as atividades por data de início.
+        - Filtra resultados por página.
+      parameters:
+        - name: userId
+          in: path
+          type: string
+          required: true
+
+        - name: page
+          in: query
+          type: int
+          required: false
+
+        - name: initialDate
+          in: query
+          type: string
+          required: false
+          example: '2024-01-01'
+
+        - name: finalDate
+          in: query
+          type: string
+          required: false
+          example: '2024-01-31'
+
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserSchedule'
+        '404':
+          description: Not Found
+        '429':
+          description: Too Many Requests
+
+  /users/{userId}/schedules/{scheduleId}:
+    get:
+      tags:
+        - Agenda de Usuário
+      summary: Carrega uma atividade da agenda do usuário
+      parameters:
+        - name: userId
+          in: path
+          type: string
+          required: true
+
+        - name: scheduleId
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSchedule'
+        '404':
+          description: Not Found
+        '429':
+          description: Too Many Requests
+
+    patch:
+      tags:
+        - Agenda de Usuário
+      summary: Atualiza uma atividade na agenda do usuário
+      parameters:
+        - name: userId
+          in: path
+          type: string
+          required: true
+
+        - name: scheduleId
+          in: path
+          type: string
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Activity'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSchedule'
+        '404':
+          description: Not Found
+        '422':
+          description: Unprocessable Content
+        '429':
+          description: Too Many Requests
+
+    delete:
+      tags:
+        - Agenda de Usuário
+      summary: Apaga uma atividade da agenda do usuário
+      parameters:
+        - name: userId
+          in: path
+          type: string
+          required: true
+
+        - name: scheduleId
+          in: path
+          type: string
+          required: true
+      responses:
+        '200':
+          description: Delete
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSchedule'
+        '404':
+          description: Not Found
+        '429':
+          description: Too Many Requests
+
+
+components:
+  schemas:
+
+    Activity:
+      type: object
+      properties:
+        title:
+          type: string
+          example: Enviar Relatórios
+        description:
+          type: string
+          example:
+            Exemplo de atividade "Enviar Relatórios"
+        start_date:
+          type: string
+          format: date
+          example: 02/01/2024 15h30
+        deadline_date:
+          type: string
+          format: date
+          example: 10/01/2024 00h00
+        end_date:
+          type: string
+          format: date
+          example: 03/01/2024 10h15
+        status:
+          type: string
+          enum:
+            - aberto
+            - concluído
+          default: aberto
+          example: aberto
+      required:
+        - title
+        - start_date
+        - deadline_date
+        - status
+
+    User:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Esdras Schonevald
+        email:
+          type: string
+          format: email
+          example: esdraschonevald@gmal.com
+        password:
+          type: string
+          format: password
+          example: Mudar@123
+
+      required:
+        - name
+        - email
+        - password
+
+    UserSchedule:
+      allOf:
+        - $ref: '#/components/schemas/User'
+        - type: object
+          properties:
+            schedules:
+              type: array
+              items:
+                $ref: '#/components/schemas/Activity'
